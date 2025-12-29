@@ -1,0 +1,15 @@
+.git
+.gitignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+notebooks/
+tests/
+
+outputs/
+artifacts/
+
+.env
+gmail_api_secret/
