@@ -290,15 +290,15 @@ PIPELINE_MODE=retrain python -m src.pipelines.full_pipeline
 
 ## 🔐 Environment Setup
 
-	1.	Copy environment file:
-	```
-    	cp .env.example .env
-	```
-    2.	2. No API keys required for LLM.
-	```
-		This project uses a locally hosted open-source LLM (Qwen 2.5 – 14B)
-		via Ollama. The model is automatically downloaded on first run and
-		reused across all pipeline executions.
+1.	Copy environment file:
+```
+	cp .env.example .env
+```
+2.	2. No API keys required for LLM.
+```
+	This project uses a locally hosted open-source LLM (Qwen 2.5 – 14B)
+	via Ollama. The model is automatically downloaded on first run and
+	reused across all pipeline executions.
 	```
 
 
@@ -331,7 +331,7 @@ cost-free, reproducible execution.
 This project was developed as part of an **MSc in Artificial Intelligence & Machine Learning**
 with emphasis on **NLP, clustering, MLOps, and production systems.**
 
-⸻
+
 
 ### 👤 Author
 
@@ -339,7 +339,7 @@ Amir Hamza Khan
 MSc AI & ML
 Jamia Millia Islamia
 
-⸻
+
 
 ### 📜 License
 
