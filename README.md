@@ -299,7 +299,7 @@ PIPELINE_MODE=retrain python -m src.pipelines.full_pipeline
 	This project uses a locally hosted open-source LLM (Qwen 2.5 – 14B)
 	via Ollama. The model is automatically downloaded on first run and
 	reused across all pipeline executions.
-	```
+```
 
 
 ## 🛠️ Installation
