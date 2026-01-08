@@ -273,7 +273,7 @@ PIPELINE_MODE=retrain python -m src.pipelines.full_pipeline
 	•	Embeddings: Transformer-based (Qwen)
 	•	Dimensionality Reduction: PCA (256 dimensions)
 	•	Clustering: Hierarchical Bisecting K-Means
-	•	Labeling: LLM-based summarization
+	•	Labeling: Open-source LLM (Qwen 2.5 – 14B via Ollama)
 	•	Classifier: MLP with AutoML architecture search
 
 
@@ -294,9 +294,11 @@ PIPELINE_MODE=retrain python -m src.pipelines.full_pipeline
 	```
     	cp .env.example .env
 	```
-    2.	Add required keys:
+    2.	2. No API keys required for LLM.
 	```
-		•	GEMINI_API_KEY
+		This project uses a locally hosted open-source LLM (Qwen 2.5 – 14B)
+		via Ollama. The model is automatically downloaded on first run and
+		reused across all pipeline executions.
 	```
 
 
@@ -307,6 +309,21 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
+
+#### 🧠 LLM Runtime
+
+This project uses a locally hosted open-source LLM:
+
+- Model: Qwen 2.5 – 14B
+- Runtime: Ollama
+- Download behavior:
+  - Model is downloaded automatically on first use
+  - Stored outside the project directory
+  - Reused across incremental and full pipeline runs
+  - Never re-downloaded unless manually removed
+
+This design mirrors embedding model caching and ensures
+cost-free, reproducible execution.
 
 
 ## 👨‍🎓 Academic Context

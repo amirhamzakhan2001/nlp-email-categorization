@@ -2,7 +2,7 @@
 
 import os
 import time
-from google import genai
+import requests
 from dotenv import load_dotenv
 
 from src.config.clustering_config import (
@@ -12,7 +12,15 @@ from src.config.clustering_config import (
 
 load_dotenv()
 
-gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+# ----------------------------
+# Ollama configuration
+# ----------------------------
+OLLAMA_BASE_URL = "http://localhost:11434"
+OLLAMA_GENERATE_URL = f"{OLLAMA_BASE_URL}/api/generate"
+OLLAMA_TAGS_URL = f"{OLLAMA_BASE_URL}/api/tags"
+OLLAMA_PULL_URL = f"{OLLAMA_BASE_URL}/api/pull"
+
+MODEL_NAME = "qwen2.5:14b"
 
 api_request_count = 0
 api_request_start_time = time.time()
@@ -28,9 +36,49 @@ def _rate_limit():
         api_request_start_time = time.time()
 
 
-def call_gemini_chat(prompt: str, max_attempts: int = 3) -> str:
+# ----------------------------
+# Ensure model exists (ONE-TIME)
+# ----------------------------
+def ensure_model_exists():
     """
-    Single Gemini call handler:
+    Checks if Qwen model exists in Ollama.
+    Automatically pulls it ONCE if missing.
+    """
+    try:
+        response = requests.get(OLLAMA_TAGS_URL, timeout=10)
+        response.raise_for_status()
+
+        models = response.json().get("models", [])
+        model_names = [m.get("name") for m in models]
+
+        if MODEL_NAME not in model_names:
+            print(f"[INFO] Model '{MODEL_NAME}' not found. Pulling now (one-time)...")
+
+            pull_response = requests.post(
+                OLLAMA_PULL_URL,
+                json={"name": MODEL_NAME},
+                timeout=3600  # allow long download
+            )
+            pull_response.raise_for_status()
+
+            print(f"[INFO] Model '{MODEL_NAME}' downloaded successfully.")
+
+    except requests.exceptions.RequestException as e:
+        raise RuntimeError(
+            "Ollama is not running or not reachable. "
+            "Start Ollama before running the pipeline."
+        ) from e
+
+
+# 🔑 Ensure model is available at import time
+ensure_model_exists()
+
+
+
+
+def call_qwen_chat(prompt: str, max_attempts: int = 3) -> str:
+    """
+    Qwen 2.5 (14B) call handler:
     - per-minute rate limiting
     - retries with exponential backoff
     """
@@ -44,14 +92,23 @@ def call_gemini_chat(prompt: str, max_attempts: int = 3) -> str:
         try:
             _rate_limit()
 
-            # ---- API call ----
-            response = gemini_client.models.generate_content(
-                model="gemini-2.5-flash-lite",
-                contents=prompt
+            payload = {
+                "model": MODEL_NAME,
+                "prompt": prompt,
+                "stream": False
+            }
+
+            response = requests.post(
+                OLLAMA_GENERATE_URL,
+                json=payload,
+                timeout=300
             )
 
+            response.raise_for_status()
+            data = response.json()
+
             api_request_count += 1
-            return response.text.strip()
+            return data["response"].strip()
 
         except Exception as e:
             last_exception = e

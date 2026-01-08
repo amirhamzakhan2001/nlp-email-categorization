@@ -1,7 +1,7 @@
 # src/labeling/prompt_builder.py
 
 import re
-from src.labeling.llm_client import call_gemini_chat
+from src.labeling.llm_client import call_qwen_chat
 
 
 
